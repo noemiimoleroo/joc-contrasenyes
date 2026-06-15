@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<title>Joc de contrasenyes</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #fdf6ff, #eef7ff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    width: 520px;
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.08);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 6px;
+    color: #3b3b3b;
+}
+
+.subtitle {
+    text-align: center;
+    color: #777;
+    margin-bottom: 18px;
+    font-size: 14px;
+}
+
+/* INPUT CONTROLAT */
+.input-wrapper {
+    padding: 0 4px;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px;
+    font-size: 18px;
+    border: 2px solid #e8e8f0;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.2s;
+    background: #fafbff;
+}
+
+input:focus {
+    border-color: #a78bfa;
+    box-shadow: 0 0 0 4px rgba(167,139,250,0.18);
+    background: white;
+}
+
+/* REGLAS */
+.rule {
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: 0.25s;
+}
+
+.ok {
+    background: linear-gradient(135deg, #dcfce7, #ecfeff);
+    color: #166534;
+    border-left: 6px solid #22c55e;
+}
+
+.bad {
+    background: linear-gradient(135deg, #ffe4e6, #fff1f2);
+    color: #9f1239;
+    border-left: 6px solid #fb7185;
+}
+
+/* PROGRESS */
+.progress {
+    height: 10px;
+    background: #f1f5f9;
+    border-radius: 20px;
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #a78bfa, #38bdf8, #34d399);
+    transition: 0.3s;
+}
+
+/* SUCCESS */
+#success {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #16a34a;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Joc de contrasenyes</h1>
+<div class="subtitle">Completa totes les regles per crear una contrasenya segura</div>
+
+<div class="input-wrapper">
+    <input id="password" type="text" placeholder="Prova una contrasenya... (no quedarà guardada)">
+</div>
+
+<div class="progress">
+    <div class="bar" id="bar"></div>
+</div>
+
+<div id="rules"></div>
+
+<div id="success">🎉 Contrasenya segura!</div>
+</div>
+
+<script>
+const input = document.getElementById("password");
+const rulesDiv = document.getElementById("rules");
+const success = document.getElementById("success");
+const bar = document.getElementById("bar");
+
+function sumNumbers(str) {
+    return (str.match(/\d/g) || []).map(Number).reduce((a,b)=>a+b,0);
+}
+
+function hasUpper(str) {
+    return /[A-Z]/.test(str);
+}
+
+function hasNumber(str) {
+    return /\d/.test(str);
+}
+
+function hasSpecial(str) {
+    return /[!@#$%^&*(),.?":{}|<>]/.test(str);
+}
+
+const rulesText = [
+    "Té almenys 5 caràcters",
+    "Inclou almenys un número",
+    "Inclou almenys una majúscula",
+    "Inclou un caràcter especial",
+    "La suma dels números és 25"
+];
+
+const ruleElements = rulesText.map((text, i) => {
+    const div = document.createElement("div");
+    div.className = "rule bad";
+    div.textContent = `Regla ${i+1}: ${text}`;
+    rulesDiv.appendChild(div);
+    return div;
+});
+
+function update() {
+    const p = input.value;
+
+    const checks = [
+        p.length >= 5,
+        hasNumber(p),
+        hasUpper(p),
+        hasSpecial(p),
+        sumNumbers(p) === 25
+    ];
+
+    let okCount = 0;
+
+    checks.forEach((ok, i) => {
+        ruleElements[i].className = "rule " + (ok ? "ok" : "bad");
+        if (ok) okCount++;
+    });
+
+    bar.style.width = (okCount / checks.length) * 100 + "%";
+
+    success.style.display = okCount === checks.length ? "block" : "none";
+}
+
+input.addEventListener("input", update);
+update();
+</script>
+
+</body>
+</html>
